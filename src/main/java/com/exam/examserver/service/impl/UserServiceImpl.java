@@ -17,6 +17,7 @@ public class UserServiceImpl implements UserService {
     private UserRepository userRepository;
     private RoleRepository roleRepository;
 
+    //this is how dependency injection is done for two things
     @Autowired
     public UserServiceImpl(UserRepository theUserRepository, RoleRepository theRoleRepository) {
         userRepository = theUserRepository;
@@ -42,5 +43,15 @@ public class UserServiceImpl implements UserService {
           local=this.userRepository.save(user);
       }
       return user;
+    }
+
+    @Override
+    public User getUser(String username){
+        return userRepository.findByUsername(username);
+    }
+
+    @Override
+    public void deleteUser(Long userId){
+        userRepository.deleteById(userId);
     }
 }
