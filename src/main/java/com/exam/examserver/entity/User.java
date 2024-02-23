@@ -11,9 +11,8 @@ import java.util.Set;
 
 @Entity
 @Table(name="users")
-public class User implements UserDetails {
-    //user class m hi userdetails ko implement kr liya spring security ke liye
-    //ab spring ko jha bhi UserDetails ki zaroorat hogi wha User ka use kr lenge
+public class User{
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
@@ -130,36 +129,7 @@ public class User implements UserDetails {
     }
 
 
-  // spring security----UserDetails ke methods
 
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-
-        Set<Authority> set=new HashSet<>();
-        for(UserRole u:userRoles){
-            set.add(new Authority(u.getRole().getRoleName()));
-        }
-
-
-        return set;
-    }
 
 
 }
