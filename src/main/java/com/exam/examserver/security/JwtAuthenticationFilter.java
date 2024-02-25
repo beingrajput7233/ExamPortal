@@ -64,7 +64,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
 
-        //
+        // validation
+
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
 

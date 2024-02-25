@@ -10,13 +10,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/auth")
+@CrossOrigin("*")
 public class AuthenticationController {
     @Autowired
     private UserDetailsService userDetailsService;
@@ -30,30 +32,37 @@ public class AuthenticationController {
 
     private Logger logger = LoggerFactory.getLogger(AuthenticationController.class);
 
+    @PostMapping("/generate-token")
+    public ResponseEntity<?> generateToken(@RequestBody JwtRequest jwtRequest) throws Exception {
+        try {
 
-    @PostMapping("/login")
-    public ResponseEntity<JwtResponse> login(@RequestBody JwtRequest request) {
+            doAuthenticate(jwtRequest.getUsername(), jwtRequest.getPassword());
 
-        this.doAuthenticate(request.getUsername(), request.getPassword());
-
-
-        UserDetails userDetails = userDetailsService.loadUserByUsername(request.getUsername());
-        String token = this.helper.generateToken(userDetails);
-
+        }catch (UsernameNotFoundException e){
+            e.printStackTrace();
+            throw new Exception("User not found ");
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        //////authenticate
+        UserDetails userDetails=this.userDetailsService.loadUserByUsername(jwtRequest.getUsername());
+        String token=this.helper.generateToken(userDetails);
         JwtResponse response = JwtResponse.builder()
-                .jwtToken(token)
-                .username(userDetails.getUsername()).build();
-        return new ResponseEntity<>(response, HttpStatus.OK);
+                .jwtToken(token).build();
+        return new ResponseEntity<>(response,HttpStatus.OK);
     }
 
-    private void doAuthenticate(String username, String password) {
+    private void doAuthenticate(String username, String password) throws Exception {
 
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(username, password);
         try {
             manager.authenticate(authentication);
 
-
-        } catch (BadCredentialsException e) {
+        }
+        catch (DisabledException e) {
+        throw new Exception("User disabled");
+        }
+        catch (BadCredentialsException e) {
             throw new BadCredentialsException(" Invalid Username or Password  !!");
         }
 
