@@ -2,6 +2,8 @@ package com.exam.examserver.controller;
 
 import com.exam.examserver.entity.JwtRequest;
 import com.exam.examserver.entity.JwtResponse;
+import com.exam.examserver.entity.User;
+import com.exam.examserver.repo.UserRepository;
 import com.exam.examserver.security.JwtHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,9 +19,14 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
+
 @RestController
 @CrossOrigin("*")
 public class AuthenticationController {
+
+    @Autowired
+    private UserRepository userRepository;
     @Autowired
     private UserDetailsService userDetailsService;
 
@@ -71,6 +78,12 @@ public class AuthenticationController {
     @ExceptionHandler(BadCredentialsException.class)
     public String exceptionHandler() {
         return "Credentials Invalid !!";
+    }
+
+    //current logged in user ki details
+    @GetMapping("/current-user")
+    public User getCurrentUser(Principal principal){
+        return (User) this.userRepository.findByUsername(principal.getName());
     }
 }
 

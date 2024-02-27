@@ -32,8 +32,7 @@ public class SecurityConfig {
         http.csrf(csrf->csrf.disable())
                 .authorizeHttpRequests(
                         auth->
-                                auth.requestMatchers("/generate-token").permitAll()
-                                        .requestMatchers("/user").permitAll()
+                                auth.requestMatchers("/generate-token","user/create-user").permitAll()
                                         .requestMatchers(HttpMethod.OPTIONS).permitAll()
                                         .anyRequest().authenticated())
                 .exceptionHandling(ex->ex.authenticationEntryPoint(point))
